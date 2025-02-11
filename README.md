@@ -2,6 +2,8 @@
 
 A command-line interface (CLI) application for managing tasks written in Python. This tool allows you to create, list, update, and manage tasks with different statuses.
 
+This project is part of https://roadmap.sh/projects/task-tracker
+
 ## Features
 
 - Create new tasks with title and description
