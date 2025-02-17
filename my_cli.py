@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import json
 from datetime import datetime
@@ -7,9 +9,10 @@ json_file = "tasks.json"
 
 #Functions
 def add_task(title, description):
+    """Add a new task to the json file"""
     try:
         if not os.path.exists(json_file):
-            # Crear el archivo con una estructura inicial si no existe
+            # create the file if not exist
             with open(json_file, "w") as file:
                 json.dump([{"id_count": 0}], file)
 
@@ -39,6 +42,7 @@ def add_task(title, description):
         print(f"An error ocurred while creating the task {e}")
 
 def list_tasks():
+    """List all the tasks in the json file"""
     try:
         with open(json_file, "r") as file:
             data = json.load(file)
@@ -52,7 +56,9 @@ def list_tasks():
                 print(f"- {num} | ID: {task['id']} | Title: {task['title']} | Description: {task['description']} | Status: {task['status']} | Created at: {task['created_at']} | Updated at: {task['updated_at']}")
     except Exception as e:
         print(f"An error occurred while listing the tasks: {e}")
+
 def list_tasks_done():
+    """List all the tasks done in the json file"""
     try:
         with open(json_file, "r") as file:
             data = json.load(file)
@@ -68,6 +74,7 @@ def list_tasks_done():
         print(f"An error occurred while listing the tasks: {e}")
 
 def list_tasks_in_progress():
+    """List all the tasks in progress in the json file"""
     try:
         with open(json_file, "r") as file:
             data = json.load(file)
@@ -83,6 +90,7 @@ def list_tasks_in_progress():
         print(f"An error occurred while listing the tasks: {e}")
 
 def list_tasks_todo():
+    """List all the tasks todo in the json file"""
     try:
         with open(json_file, "r") as file:
             data = json.load(file)
@@ -98,6 +106,7 @@ def list_tasks_todo():
         print(f"An error occurred while listing the tasks: {e}")
 
 def delete_task(id):
+    """Delete a task from the json file"""
     with open(json_file, "r") as file:
         data = json.load(file)
         for task in data:
@@ -107,66 +116,33 @@ def delete_task(id):
                 with open(json_file, "w") as file2:
                     json.dump(data, file2, indent=4)
                 return 
-        print("la tarea no existe")
+        print("The task not exist")
     with open(json_file, "w") as file:
         json.dump(data, file, indent=4)
 
-def mark_in_progress(id):
+def mark_task(id, status):
+    """Mark a task with a given status"""
     with open(json_file, "r") as file:
         data = json.load(file)
         for task in data:
             if "id" in task and id == task["id"]:
-                if task["status"] == "in-progress": print("The task is already in progress"); return
+                if task["status"] == status:
+                    print(f"The task is already {status}")
+                    return
                 now = datetime.now()
                 date = now.strftime("%d/%m/%Y %H:%M")
-                task["status"] = "in-progress"
+                task["status"] = status
                 task["updated_at"] = date
-                print(f"task {id} is now in progress")
+                print(f"Task {id} is now {status}")
 
                 with open(json_file, "w") as file2:
                     json.dump(data, file2, indent=4)
                     return
-    print("The task not exist")
-    return
-
-def mark_done(id):
-    with open(json_file, "r") as file:
-        data = json.load(file)
-        for task in data:
-            if "id" in task and id == task["id"]:
-                if task["status"] == "done": print("The task is already done"); return
-                now = datetime.now()
-                date = now.strftime("%d/%m/%Y %H:%M")
-                task["status"] = "done"
-                task["updated_at"] = date
-                print(f"Task {id}  is now done")
-
-                with open(json_file, "w") as file2:
-                    json.dump(data, file2, indent=4)
-                    return
-    print("The task not exist")
-    return
-
-def mark_todo(id):
-    with open(json_file, "r") as file:
-        data = json.load(file)
-        for task in data:
-            if "id" in task and id == task["id"]:
-                if task["status"] == "todo": print("The task is already in todo"); return
-                now = datetime.now()
-                date = now.strftime("%d/%m/%Y %H:%M")
-                task["status"] = "todo"
-                task["updated_at"] = date
-                print(f"task {id} is now in todo")
-
-                with open(json_file, "w") as file2:
-                    json.dump(data, file2, indent=4)
-                    return
-    print("The task not exist")
+    print("The task does not exist")
     return
 
 def update_task(id, new_title):
-
+    """Update the title of a task"""
     with open(json_file, "r") as file:
         data = json.load(file)
 
@@ -186,6 +162,8 @@ def update_task(id, new_title):
 
 
 def main():
+
+    #Parser
     parse = argparse.ArgumentParser("Task Tracker", description="Task manager")
 
     subparsers = parse.add_subparsers(dest="command")
@@ -196,16 +174,16 @@ def main():
     add_task_parser.add_argument("description", type=str, help="description of the task")
 
     #List Tasks
-    list_tasks_parser = subparsers.add_parser("list", description="list all the tasks")
+    subparsers.add_parser("list", description="list all the tasks")
 
     #List Tasks Done
-    list_tasks_done_parser = subparsers.add_parser("list-done", description="list the tasks done")
+    subparsers.add_parser("list-done", description="list the tasks done")
 
     #List Tasks Done
-    list_tasks_in_progress_parser = subparsers.add_parser("list-in-progress", description="list the tasks in-progress")
+    subparsers.add_parser("list-in-progress", description="list the tasks in-progress")
 
     #List Tasks Done
-    list_tasks_todo_parser = subparsers.add_parser("list-todo", description="list the tasks todo")
+    subparsers.add_parser("list-todo", description="list the tasks todo")
 
     #delete Tasks
     delete_task_parser = subparsers.add_parser("delete", description="Delete one task", help="tasks_id")
@@ -244,11 +222,11 @@ def main():
     elif args.command == "delete":
         delete_task(args.id)
     elif args.command == "mark-in-progress":
-        mark_in_progress(args.id)
+        mark_task(args.id, "in-progress")
     elif args.command == "mark-done":
-        mark_done(args.id)
+        mark_task(args.id, "done")
     elif args.command == "mark-todo":
-        mark_todo(args.id)
+        mark_task(args.id, "todo")
     elif args.command == "update":
         update_task(args.id, args.new_title)
 
